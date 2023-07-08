@@ -15,6 +15,10 @@ RISK_FREE_RATE = 0.03
 
 timeframe = 365 #TODO: rename and find a way to dynamically adjust this based on the asset type
 
+def isCrypto(asset):
+    """Returns true if the asset is a cryptocurrency"""
+    return asset[-3:] == "-USD"
+
 
 def getAssetData(asset, start, end): 
     """Returns the mean returns and covariance matrix of the asset data from yahoo finance in the specified time period"""
@@ -25,9 +29,12 @@ def getAssetData(asset, start, end):
     return mean_returns, cov_matrix
 
 def calculateTotalPortfolioPerformance(assetWeights, mean_returns, cov_matrix):
+    if isCrypto(mean_returns.index[0]) == False:
+        timeframe = timeframe * 252/365
+
     """Returns the total portfolio performance in terms of returns and standard deviation"""
-    returns = np.sum(mean_returns*assetWeights) * timeframe #250 for traditional assets & 365 for crypto assets
-    std = np.sqrt(np.dot(assetWeights.T, np.dot(cov_matrix, assetWeights))) * np.sqrt(timeframe) #250 for traditional assets & 365 for crypto assets
+    returns = np.sum(mean_returns*assetWeights) * timeframe 
+    std = np.sqrt(np.dot(assetWeights.T, np.dot(cov_matrix, assetWeights))) * np.sqrt(timeframe)
     return returns, std
 
 
